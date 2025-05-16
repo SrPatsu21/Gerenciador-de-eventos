@@ -1,0 +1,35 @@
+CREATE TABLE IF NOT EXISTS USERS (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    google_id TEXT UNIQUE,
+    name TEXT,
+    email TEXT,
+    role TEXT CHECK(role IN ('admin', 'participant')) DEFAULT 'participant'
+);
+
+CREATE TABLE IF NOT EXISTS EVENTS (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    description TEXT,
+    date TEXT,
+    location TEXT,
+    created_by INTEGER,
+    FOREIGN KEY(created_by) REFERENCES USERS(id)
+);
+
+CREATE TABLE IF NOT EXISTS COSTS (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_id INTEGER,
+    description TEXT,
+    amount REAL,
+    FOREIGN KEY(event_id) REFERENCES EVENTS(id)
+);
+
+CREATE TABLE IF NOT EXISTS PARTICIPATIONS (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    event_id INTEGER,
+    confirmed BOOLEAN DEFAULT 0,
+    paid BOOLEAN DEFAULT 0,
+    FOREIGN KEY(user_id) REFERENCES USERS(id),
+    FOREIGN KEY(event_id) REFERENCES EVENTS(id)
+);

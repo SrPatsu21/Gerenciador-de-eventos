@@ -1,0 +1,128 @@
+openapi: 3.0.0
+info:
+  title: API - Gerenciador de Eventos
+  version: 1.0.0
+  description: API para gerenciamento de eventos com autenticação via Gmail.
+
+servers:
+  - url: http://localhost:3000
+
+tags:
+  - name: Auth
+    description: Autenticação com Google
+  - name: Eventos
+    description: Operações com eventos
+  - name: Participações
+    description: Confirmação e pagamento
+
+paths:
+  /auth/google:
+    get:
+      tags:
+        - Auth
+      summary: Inicia login com Google
+      responses:
+        '302':
+          description: Redireciona para autenticação Google
+
+  /auth/google/callback:
+    get:
+      tags:
+        - Auth
+      summary: Callback do login Google
+      responses:
+        '302':
+          description: Redireciona para o perfil do usuário
+
+  /profile:
+    get:
+      tags:
+        - Auth
+      summary: Perfil do usuário autenticado
+      responses:
+        '200':
+          description: Informações do usuário logado
+        '401':
+          description: Não autenticado
+
+  /events:
+    get:
+      tags:
+        - Eventos
+      summary: Lista todos os eventos
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Lista de eventos
+
+    post:
+      tags:
+        - Eventos
+      summary: Cria um novo evento (admin)
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                date:
+                  type: string
+                  format: date-time
+                location:
+                  type: string
+      responses:
+        '201':
+          description: Evento criado
+        '403':
+          description: Acesso restrito
+
+  /events/{id}/confirm:
+    post:
+      tags:
+        - Participações
+      summary: Confirma presença no evento
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID do evento
+      responses:
+        '200':
+          description: Presença confirmada
+
+  /events/{id}/pay:
+    post:
+      tags:
+        - Participações
+      summary: Marca pagamento do evento
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID do evento
+      responses:
+        '200':
+          description: Pagamento confirmado
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: connect.sid
