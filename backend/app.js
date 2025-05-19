@@ -63,4 +63,5 @@ app.use('/events', eventsRouter);
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
+  console.log(`API docs rodando em http://localhost:${PORT}/api-docs/`);
 });
